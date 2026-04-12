@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Matram - Form Submission</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="background-elements">
+    <div class="blob top-left"></div>
+    <div class="blob bottom-right"></div>
+  </div>
+
+  <div class="app-container">
+    <header class="form-header">
+      <div class="logo">Krish Global Academy</div>
+      <div class="progress-wrap">
+        <span id="progressText">1 / 5</span>
+      </div>
+    </header>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="screens-container" id="screensContainer">
+
+      <!-- Screen 0: Welcome -->
+      <div class="screen active" data-index="0" style="padding-top: 50px;">
+        <div class="content fade-in-up">
+
+          <div class="presentation-badge">
+            <span class="academy-name">KRISH GLOBAL ACADEMY</span>
+            <span class="academy-sub">(A Unit of Arunachalam Group of Companies)</span>
+          </div>
+
+          <div class="presents-text">PRESENTS</div>
+
+          <div class="title-lockup">
+            <h1 class="main-title" style="margin-bottom:0;">Matram</h1>
+            <div class="sub-titles">
+              <span class="eng-sub">- The Change Within -</span>
+              <span class="tam-sub" style="margin-top: 8px;">மாற்றம் - ஒரு புதிய ஆரம்பம்</span>
+              <span class="eng-sub-small">(A New Beginning)</span>
+            </div>
+          </div>
+
+          <div class="quote-box">
+            <p>What you learn here, can change your destiny...</p>
+            <p><strong>Change your thoughts, change your life.</strong></p>
+          </div>
+
+          <div class="footer-lockup">
+            <div class="experience-tag">
+              <span class="tag-label">NOT JUST A SESSION</span>
+              <span class="tag-value">A LIFE CHANGING EXPERIENCE</span>
+            </div>
+
+            <button class="primary-btn pulse-glow" style="width:100%; border-radius: 16px;" onclick="nextScreen()">
+              <div class="btn-content">
+                <span class="btn-top">ENROL NOW TO</span>
+                <span class="btn-main">EXPERIENCE EXCELLENCE</span>
+              </div>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto;">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Screen 1: Name -->
+      <div class="screen" data-index="1">
+        <div class="content">
+          <h2>Change Your Thoughts,<br>Change Your Life...</h2>
+          <p class="subtitle">Let's start your new beginning. What is your full name?</p>
+          <div class="input-group">
+            <input type="text" id="nameInput" placeholder="e.g. Jane Doe" required autocomplete="name">
+            <div class="focus-border"></div>
+          </div>
+          <button class="primary-btn mt-large" onclick="nextScreen()">
+            <span>Continue</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Screen 2: Email -->
+      <div class="screen" data-index="2">
+        <div class="content">
+          <h2>Where should we send your class details?</h2>
+          <p class="subtitle">We'll send your masterclass invitation here.</p>
+          <div class="input-group">
+            <input type="email" id="emailInput" placeholder="name@example.com" required autocomplete="email">
+            <div class="focus-border"></div>
+          </div>
+          <button class="primary-btn mt-large" onclick="nextScreen()">
+            <span>Continue</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Screen 3: Interest -->
+      <div class="screen" data-index="3">
+        <div class="content">
+          <h2>What is your primary goal?</h2>
+          <p class="subtitle">Select the area you want to improve the most.</p>
+          <div class="options-grid">
+            <div class="option-card">
+              <div class="option-icon">💎</div>
+              <span>Confidence</span>
+            </div>
+            <div class="option-card">
+              <div class="option-icon">📈</div>
+              <span>Career Growth</span>
+            </div>
+            <div class="option-card">
+              <div class="option-icon">🧠</div>
+              <span>Mindset</span>
+            </div>
+            <div class="option-card">
+              <div class="option-icon">🌱</div>
+              <span>Personal Wellness</span>
+            </div>
+          </div>
+          <!-- Next triggered automatically on select -->
+        </div>
+      </div>
+
+      <!-- Screen 4: Comments -->
+      <div class="screen" data-index="4">
+        <div class="content">
+          <h2>Anything else you'd like to share?</h2>
+          <p class="subtitle">Tell us briefly about your biggest current challenge.</p>
+          <div class="input-group">
+            <textarea id="detailsInput" placeholder="I struggle with..." rows="4"></textarea>
+            <div class="focus-border"></div>
+          </div>
+          <button class="primary-btn mt-large finish-btn" onclick="nextScreen()">
+            <span>Submit</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Screen 5: Success -->
+      <div class="screen" data-index="5">
+        <div class="content text-center success-content">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h1>You're In!</h1>
+          <p class="subtitle">Get ready for a life-changing experience. We will email your class details shortly.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
