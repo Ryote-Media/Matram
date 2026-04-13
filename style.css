@@ -242,6 +242,9 @@ p.subtitle {
 
 input[type="text"],
 input[type="email"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
 textarea {
   width: 100%;
   background: transparent;
@@ -426,7 +429,32 @@ textarea:focus~.focus-border::after {
   height: 40px;
 }
 
-/* Animations */
+/* Specific Input Styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Conditional Inputs */
+.conditional-wrap {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+  margin-top: 0;
+}
+
+.conditional-wrap.show {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 16px;
+}
+
 .fade-in-up {
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
