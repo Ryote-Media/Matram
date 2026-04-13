@@ -5,15 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressBar = document.getElementById('progressBar');
   const progressText = document.getElementById('progressText');
   const totalScreens = screens.length;
-  // Subtracting Welcome(1) and Success(1) screens from total form steps
+  // Subtracting Welcome(start) and Success(end) screens from total form steps
   const totalSteps = totalScreens - 2;
 
-  const formData = {
-    name: '',
-    email: '',
-    interest: '',
-    details: ''
-  };
+  const formData = {};
 
   const updateProgress = () => {
     let progress = 0;
@@ -38,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
         screen.classList.remove('previous');
         screen.classList.add('active');
 
-        // Auto-focus input after transition
-        const input = screen.querySelector('input, textarea');
+        // Auto-focus first visible input after transition
+        const input = screen.querySelector('input:not([type="hidden"]), textarea');
         if (input) {
           setTimeout(() => {
             input.focus();
@@ -58,50 +53,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const validateCurrentScreen = () => {
     const currentActive = screens[currentScreen];
-    const input = currentActive.querySelector('input, textarea');
+    let isValid = true;
+    
+    // Check all inputs that are required and visible
+    const inputs = currentActive.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+      // If inside a conditional wrap that is not shown, skip validation
+      const wrap = input.closest('.conditional-wrap');
+      if (wrap && !wrap.classList.contains('show')) return;
 
-    if (input && input.hasAttribute('required')) {
-      if (!input.value.trim()) {
-        const inputGroup = currentActive.querySelector('.input-group');
-        inputGroup.classList.remove('error-shake');
-        // trigger reflow
-        void inputGroup.offsetWidth;
-        inputGroup.classList.add('error-shake');
+      if (input.hasAttribute('required')) {
+        if (!input.value.trim()) {
+          const inputGroup = input.closest('.input-group');
+          if (inputGroup) {
+            inputGroup.classList.remove('error-shake');
+            void inputGroup.offsetWidth;
+            inputGroup.classList.add('error-shake');
 
-        const focusBorder = currentActive.querySelector('.focus-border');
-        if (focusBorder) {
-          focusBorder.style.backgroundColor = '#ef4444';
-          setTimeout(() => {
-            focusBorder.style.backgroundColor = 'var(--border-light)';
-          }, 1500);
+            const focusBorder = inputGroup.querySelector('.focus-border');
+            if (focusBorder) {
+              focusBorder.style.backgroundColor = '#ef4444';
+              setTimeout(() => {
+                focusBorder.style.backgroundColor = 'var(--border-light)';
+              }, 1500);
+            }
+          }
+          isValid = false;
         }
-        return false;
-      }
 
-      // Basic email validation
-      if (input.type === 'email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(input.value.trim())) {
-          const inputGroup = currentActive.querySelector('.input-group');
-          inputGroup.classList.remove('error-shake');
-          void inputGroup.offsetWidth;
-          inputGroup.classList.add('error-shake');
-          return false;
+        // Basic email validation
+        if (input.type === 'email' && input.value.trim()) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(input.value.trim())) {
+            isValid = false;
+          }
         }
       }
-    }
-    return true;
+    });
+    
+    return isValid;
   };
 
   const saveCurrentData = () => {
     const currentActive = screens[currentScreen];
 
     // Save text input data
-    const input = currentActive.querySelector('input, textarea');
-    if (input) {
+    const inputs = currentActive.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+      const wrap = input.closest('.conditional-wrap');
+      if (wrap && !wrap.classList.contains('show')) return; // Skip hidden conditionals
+
       const id = input.id.replace('Input', '');
       formData[id] = input.value.trim();
-    }
+    });
   };
 
   window.nextScreen = () => {
@@ -119,12 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // --- PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE ---
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPQGTc2uv-iSvN2cxKmKeUnxcdW-y4dPV4MKFLS2BZ9UQnLcU0Y_MYIHDLST89-3Qw/exec';
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4J0xgGfFv1-DsU2-dvzXK4w8Et63c0oAMo4IBH4nhZJn_2xMk6kyGAaLLo3AK5Gq-/exec';
 
       if (!GOOGLE_SCRIPT_URL) {
         console.warn('Form data ready, but no GOOGLE_SCRIPT_URL provided:', formData);
-        console.warn('Please follow the walkthrough to add your Google Script URL.');
-        // Move to success screen anyway for demo
+        // Move to success screen
         currentScreen++;
         showScreen(currentScreen);
         return;
@@ -139,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify(formData)
       })
         .then(response => {
-          // Progress to success screen on success
           currentScreen++;
           showScreen(currentScreen);
         })
@@ -155,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return; // Wait for fetch
     }
 
-    // Normal progression for other question screens
+    // Normal progression
     if (currentScreen < totalScreens - 2) {
       currentScreen++;
       showScreen(currentScreen);
@@ -167,12 +169,53 @@ document.addEventListener('DOMContentLoaded', () => {
   optionCards.forEach(card => {
     card.addEventListener('click', function () {
       const screen = this.closest('.screen');
-      screen.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      const grid = this.closest('.options-grid');
+      const field = grid.dataset.field; // "gender", "occupation", etc.
+
+      grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
       this.classList.add('selected');
 
-      formData.interest = this.querySelector('span').textContent;
+      const val = this.dataset.value;
+      if (field) {
+        formData[field] = val;
+      }
 
-      // Auto-advance
+      // Handle conditional reveals without auto-advancing
+      if (field === 'occupation') {
+        const studentWrap = document.getElementById('studentCourseWrap');
+        if (val === 'Student') {
+          studentWrap.classList.add('show');
+          const courseInput = document.getElementById('courseInput');
+          courseInput.setAttribute('required', 'true');
+          setTimeout(() => courseInput.focus(), 300);
+          return;
+        } else {
+          studentWrap.classList.remove('show');
+          document.getElementById('courseInput').removeAttribute('required');
+        }
+      }
+
+      if (field === 'health_issues') {
+        const healthWrap = document.getElementById('healthIssueWrap');
+        if (val === 'Yes') {
+          healthWrap.classList.add('show');
+          const healthInput = document.getElementById('healthDetailsInput');
+          healthInput.setAttribute('required', 'true');
+          setTimeout(() => healthInput.focus(), 300);
+          return;
+        } else {
+          healthWrap.classList.remove('show');
+          document.getElementById('healthDetailsInput').removeAttribute('required');
+        }
+      }
+
+      if (field === 'charity') {
+        const charityWrap = document.getElementById('charitySubmitWrap');
+        charityWrap.classList.add('show');
+        return; // wait for manual submit to avoid accidental submission
+      }
+
+      // Auto-advance for standard option selects
       setTimeout(() => {
         nextScreen();
       }, 350);
