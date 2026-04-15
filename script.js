@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentScreen === 0) {
       progress = 0;
       progressText.textContent = `Start`;
-    } else if (currentScreen === totalScreens - 1) {
+    } else if (currentScreen === totalScreens - 1) {  
       progress = 100;
       progressText.textContent = `Done`;
     } else {
