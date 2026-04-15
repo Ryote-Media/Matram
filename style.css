@@ -521,14 +521,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   font-size: 9px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: #f4f4f5;
 }
 
 .presents-text {
   font-size: 12px;
   letter-spacing: 8px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: rgba(255, 255, 255, 0.4);
   margin-bottom: 24px;
 }
 
