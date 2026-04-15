@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentScreen === 0) {
       progress = 0;
       progressText.textContent = `Start`;
-    } else if (currentScreen === totalScreens - 1) {  
+    } else if (currentScreen === totalScreens - 1) {
       progress = 100;
       progressText.textContent = `Done`;
     } else {
@@ -48,13 +48,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Special handling for success screen background
+    if (index === 13) {
+      document.body.classList.add('success-state');
+    } else {
+      document.body.classList.remove('success-state');
+    }
+
     updateProgress();
   };
 
   const validateCurrentScreen = () => {
     const currentActive = screens[currentScreen];
     let isValid = true;
-    
+
     // Check all inputs that are required and visible
     const inputs = currentActive.querySelectorAll('input, textarea');
     inputs.forEach(input => {
@@ -90,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    
+
     return isValid;
   };
 
