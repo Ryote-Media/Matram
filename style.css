@@ -1004,3 +1004,44 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-size: 28px;
   }
 }
+
+/* --- Peacock Background for Success Screen --- */
+
+body.success-state {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)),
+    url('peacock-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  transition: background 1s ease-in-out;
+}
+
+body.success-state .blob {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+body.success-state .app-container {
+  background: transparent;
+}
+
+/* Success content refine */
+.success-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+.success-content .main-title {
+  background: linear-gradient(135deg, #ffffff 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.3));
+}
+
+.success-icon {
+  background: #34d399 !important;
+  box-shadow: 0 0 40px rgba(52, 211, 153, 0.5) !important;
+}
