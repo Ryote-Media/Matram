@@ -95,23 +95,75 @@ document.addEventListener('DOMContentLoaded', () => {
             isValid = false;
           }
         }
+
+        // Phone validation (WhatsApp) - require at least 10 digits
+        if (input.type === 'tel' && input.value.trim()) {
+          const digitsOnly = input.value.replace(/\D/g, '');
+          if (digitsOnly.length < 10 || digitsOnly.length > 15) {
+            isValid = false;
+          }
+        }
+
+        // Strict Age Validation (15 - 25)
+        if (input.id === 'ageInput' && input.value.trim()) {
+          const age = parseInt(input.value.trim(), 10);
+          if (isNaN(age) || age < 15 || age > 25) {
+            isValid = false;
+            alert('Sorry, this program is exclusively for individuals between 15 and 25 years of age.');
+          }
+        }
+
+        // Strict DOB Validation (cross-checking with the 15 - 25 rule)
+        if (input.id === 'dobInput' && input.value.trim()) {
+          const dobDate = new Date(input.value);
+          if (isNaN(dobDate.getTime())) {
+            isValid = false;
+            alert('Please enter a valid Date of Birth.');
+          } else {
+            const today = new Date();
+            let calculatedAge = today.getFullYear() - dobDate.getFullYear();
+            const m = today.getMonth() - dobDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+              calculatedAge--;
+            }
+            if (calculatedAge < 14 || calculatedAge > 26) { // Allowing a slight 1-year buffer for edge cases/timezones
+              isValid = false;
+              alert('The Date of Birth provided does not fall within the eligible 15-25 age range.');
+            }
+          }
+        }
       }
     });
 
     return isValid;
   };
 
+  // Sanitize input to prevent XSS and malicious script injection
+  const sanitizeInput = (str) => {
+    if (!str) return '';
+    return str.replace(/[&<>"']/g, function (match) {
+      const escape = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      };
+      return escape[match];
+    });
+  };
+
   const saveCurrentData = () => {
     const currentActive = screens[currentScreen];
 
     // Save text input data
-    const inputs = currentActive.querySelectorAll('input, textarea');
+    const inputs = currentActive.querySelectorAll('input:not([type="file"]), textarea');
     inputs.forEach(input => {
       const wrap = input.closest('.conditional-wrap');
       if (wrap && !wrap.classList.contains('show')) return; // Skip hidden conditionals
 
       const id = input.id.replace('Input', '');
-      formData[id] = input.value.trim();
+      formData[id] = sanitizeInput(input.value.trim());
     });
   };
 
@@ -131,35 +183,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // --- PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE ---
       const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4J0xgGfFv1-DsU2-dvzXK4w8Et63c0oAMo4IBH4nhZJn_2xMk6kyGAaLLo3AK5Gq-/exec';
+      const IMGBB_API_KEY = 'fe9e4c2793185f2e04583e47b519e84d';
 
       if (!GOOGLE_SCRIPT_URL) {
         console.warn('Form data ready, but no GOOGLE_SCRIPT_URL provided:', formData);
-        // Move to success screen
         currentScreen++;
         showScreen(currentScreen);
         return;
       }
 
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
-        body: JSON.stringify(formData)
-      })
-        .then(response => {
-          currentScreen++;
-          showScreen(currentScreen);
+      const submitToGoogle = () => {
+        fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          body: JSON.stringify(formData)
         })
-        .catch(error => {
-          console.error('Error submitting form:', error);
-          alert('There was a problem submitting the form. Please try again.');
-          if (submitBtn) {
-            submitBtn.innerHTML = originalContent;
-            submitBtn.style.pointerEvents = 'auto';
-          }
-        });
+          .then(response => {
+            currentScreen++;
+            showScreen(currentScreen);
+          })
+          .catch(error => {
+            console.error('Error submitting form:', error);
+            alert('There was a problem submitting the form. Please try again.');
+            if (submitBtn) {
+              submitBtn.innerHTML = originalContent;
+              submitBtn.style.pointerEvents = 'auto';
+            }
+          });
+      };
+
+      // Upload image to ImgBB first if present
+      if (formData.screenshot && formData.screenshot.startsWith('data:image')) {
+        const base64Image = formData.screenshot.split(',')[1];
+        const imgData = new FormData();
+        imgData.append('image', base64Image);
+
+        fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+          method: 'POST',
+          body: imgData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              // Replace the massive base64 string with just the URL link
+              formData.screenshot = data.data.url;
+            }
+            submitToGoogle();
+          })
+          .catch(err => {
+            console.error('ImgBB Upload Error:', err);
+            // Fallback: still submit the form, though without the URL
+            formData.screenshot = 'Failed to upload screenshot to ImgBB';
+            submitToGoogle();
+          });
+      } else {
+        submitToGoogle();
+      }
 
       return; // Wait for fetch
     }
@@ -244,6 +326,22 @@ document.addEventListener('DOMContentLoaded', () => {
         nextScreen();
       }
     }
+  });
+
+  // Handle file uploads
+  const fileInputs = document.querySelectorAll('input[type="file"]');
+  fileInputs.forEach(input => {
+    input.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const id = input.id.replace('Input', '');
+          formData[id] = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
   });
 
   // Initialize

@@ -100,12 +100,12 @@
           <h2>About You</h2>
           <p class="subtitle">Please provide your age and date of birth.</p>
           <div class="input-group">
-            <input type="number" id="ageInput" placeholder="Your Age" required min="10" max="120"
+            <input type="number" id="ageInput" placeholder="Your Age" required min="15" max="25"
               style="margin-bottom: 24px;">
             <div class="focus-border"></div>
           </div>
           <div class="input-group" style="margin-top: 16px;">
-            <input type="date" id="dobInput" required>
+            <input type="date" id="dobInput" min="1999-01-01" max="2012-12-31" required>
             <div class="focus-border"></div>
           </div>
           <button class="primary-btn mt-large" onclick="nextScreen()">
@@ -235,16 +235,29 @@
       <div class="screen" data-index="9">
         <div class="content">
           <h2>Registration Fee Payment</h2>
-          <p class="subtitle">How would you like to pay the ₹350 registration fee? (Our team will contact you within 24
-            hours)</p>
-          <div class="options-grid" data-field="payment">
-            <div class="option-card" data-value="Online">
-              <span>Online Payment</span>
-            </div>
-            <div class="option-card" data-value="Offline">
-              <span>Offline / Cash</span>
-            </div>
+          <p class="subtitle">Please scan the QR code below to pay the ₹349 registration fee.</p>
+
+          <div class="qr-container" style="display: flex; justify-content: center; margin: 24px 0;">
+            <img src="ak-qr.jpeg" alt="Payment QR Code"
+              style="max-width: 220px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid var(--border-light);">
           </div>
+
+          <div class="input-group">
+            <input type="text" id="utrInput" placeholder="Enter UPI Reference No. / UTR" required>
+            <div class="focus-border"></div>
+          </div>
+
+          <div class="input-group" style="margin-top: 20px;">
+            <p style="font-size: 14px; margin-bottom: 8px; color: var(--text-light); text-align: left;">Upload Payment
+              Screenshot</p>
+            <input type="file" id="screenshotInput" accept="image/*" required
+              style="padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-light); border-radius: 12px; width: 100%; color: var(--text-main); font-family: inherit;">
+            <div class="focus-border"></div>
+          </div>
+
+          <button class="primary-btn mt-large" onclick="nextScreen()">
+            <span>Confirm Payment</span>
+          </button>
         </div>
       </div>
 
