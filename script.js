@@ -104,16 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        // Strict Age Validation (15 - 25)
+        // Strict Age Validation (13 - 25)
         if (input.id === 'ageInput' && input.value.trim()) {
           const age = parseInt(input.value.trim(), 10);
-          if (isNaN(age) || age < 15 || age > 25) {
+          if (isNaN(age) || age < 13 || age > 25) {
             isValid = false;
-            alert('Sorry, this program is exclusively for individuals between 15 and 25 years of age.');
+            alert('Sorry, this program is exclusively for individuals between 13 and 25 years of age.');
           }
         }
 
-        // Strict DOB Validation (cross-checking with the 15 - 25 rule)
+        // Strict DOB Validation (cross-checking with the 13 - 25 rule)
         if (input.id === 'dobInput' && input.value.trim()) {
           const dobDate = new Date(input.value);
           if (isNaN(dobDate.getTime())) {
@@ -126,9 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
               calculatedAge--;
             }
-            if (calculatedAge < 14 || calculatedAge > 26) { // Allowing a slight 1-year buffer for edge cases/timezones
+            if (calculatedAge < 12 || calculatedAge > 26) { // Allowing a slight 1-year buffer for edge cases/timezones
               isValid = false;
-              alert('The Date of Birth provided does not fall within the eligible 15-25 age range.');
+              alert('The Date of Birth provided does not fall within the eligible 13-25 age range.');
             }
           }
         }
@@ -331,11 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle file uploads
   const fileInputs = document.querySelectorAll('input[type="file"]');
   fileInputs.forEach(input => {
-    input.addEventListener('change', function(e) {
+    input.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
           const id = input.id.replace('Input', '');
           formData[id] = event.target.result;
         };
